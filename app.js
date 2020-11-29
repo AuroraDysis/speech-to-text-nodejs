@@ -15,6 +15,7 @@
  */
 
 const express = require('express');
+var bodyParser = require('body-parser')
 
 const app = express();
 const { IamTokenManager } = require('ibm-watson/auth');
@@ -39,6 +40,45 @@ app.get('/api/v1/credentials', async (req, res, next) => {
       accessToken,
       serviceUrl,
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/*const Caiyun = require('@opentranslate/caiyun').Caiyun;
+
+const caiyun = new Caiyun({
+    config: {
+      token: process.env.CAIYUN_TOKEN
+    }
+});*/
+
+/*
+const Google = require('@opentranslate/google').Google;
+
+const google = new Google({
+  order: ['com', 'cn'],
+  // search all at the same time
+  concurrent: true,
+  // googleapi as fallback
+  apiAsFallback: true
+})*/
+
+const Baidu = require('@opentranslate/baidu').Baidu;
+
+//Please refer to http://api.fanyi.baidu.com/api/trans/product/prodinfo
+const baidu = new Baidu({
+    config: {
+        appid: process.env.BAIDU_APP_ID,
+        key: process.env.BAIDU_APP_KEY
+    }
+})
+
+app.post('/api/v1/translate', bodyParser.text(), async (req, res, next) => {
+  try {
+    console.log(req.body);
+    const translateResult = await baidu.translate(req.body, "en", "zh-CN");
+    res.json(translateResult);
   } catch (err) {
     next(err);
   }
